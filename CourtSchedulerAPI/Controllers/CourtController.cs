@@ -1,19 +1,19 @@
 ﻿using CourtSchedulerAPI.Types;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Dapper;
-using System.Data;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace CourtSchedulerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PlayerController : ControllerBase
+    public class CourtController : ControllerBase
     {
         private readonly string _db = "";
 
-        public PlayerController(IConfiguration configuration)
+        public CourtController(IConfiguration configuration)
         {
             var connString = configuration.GetConnectionString("COURT_SCHEDULER");
             if (connString != null) _db = connString;
@@ -21,44 +21,60 @@ namespace CourtSchedulerAPI.Controllers
 
         [HttpGet]
         [Route("{playerID}")]
-        public Player Get([FromQuery] int playerID)
+        public Court Get([FromQuery] int courtId)
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var player = conn.QueryFirstOrDefault<Player>("dbo.Player_Select", new { ID = playerID }, commandType: CommandType.StoredProcedure);
-                return player;
+                var sql = """
+                    SELECT * FROM Court
+                    WHERE CourtId = @courtId
+                    """;
+
+                var court = conn.QueryFirst<Court>(sql, new { courtId });
+                return court;
             }
         }
 
         [HttpGet]
         [Route("")]
-        public IList<Player> GetAll()
+        public IList<Court> GetAll()
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var players = conn.Query<Player>("dbo.Player_Select", commandType: CommandType.StoredProcedure).ToList();
-                return players;
+                var sql = "SELECT * FROM Court";
+
+                var court = conn.Query<Court>(sql).ToList();
+                return court;
             }
         }
 
         [HttpPost]
         [Route("")]
-        public int Add(Player req)
+        public int Add(Court req)
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var res = conn.Execute("dbo.Player_Insert", req, commandType: CommandType.StoredProcedure);
+                var sql = """
+                    INSERT INTO Court (Name)
+                    VALUES (@Name)
+                    """;
+                var res = conn.Execute(sql, req);
                 return res;
             }
         }
 
         [HttpPut]
         [Route("")]
-        public int Update(Player req)
+        public int Update(Court court)
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var res = conn.Execute("dbo.Player_Update", req, commandType: CommandType.StoredProcedure);
+                var sql = """
+                    UPDATE Court SET
+                    	Name = COALESCE(@Name, Name),
+                    WHERE CourtId = @CourtId; 
+                    """;
+                var res = conn.Execute(sql, court);
                 return res;
             }
         }
