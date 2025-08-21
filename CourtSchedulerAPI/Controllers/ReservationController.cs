@@ -52,7 +52,7 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = """
-                    INSERT INTO Reservation (PlayerId, CourtId, ScheduledTime)
+                    INSERT INTO Reservations (PlayerId, CourtId, ScheduledTime)
                     VALUES (@PlayerId, @CourtId, @ScheduledTime)
                     """;
                 var res = conn.Execute(sql, req);

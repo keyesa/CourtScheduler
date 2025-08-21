@@ -26,7 +26,7 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = """
-                    SELECT * FROM Court
+                    SELECT * FROM Courts
                     WHERE CourtId = @courtId
                     """;
 
@@ -41,7 +41,7 @@ namespace CourtSchedulerAPI.Controllers
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var sql = "SELECT * FROM Court";
+                var sql = "SELECT * FROM Courts";
 
                 var court = conn.Query<Court>(sql).ToList();
                 return court;
@@ -55,7 +55,7 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = """
-                    INSERT INTO Court (Name)
+                    INSERT INTO Courts (Name)
                     VALUES (@Name)
                     """;
                 var res = conn.Execute(sql, req);
@@ -70,7 +70,7 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = """
-                    UPDATE Court SET
+                    UPDATE Courts SET
                     	Name = COALESCE(@Name, Name),
                     WHERE CourtId = @CourtId; 
                     """;

@@ -26,7 +26,7 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = """
-                    SELECT * FROM Player WHERE PlayerId = COALESCE(@playerID, PlayerId)
+                    SELECT * FROM Players WHERE PlayerId = COALESCE(@playerID, PlayerId)
                     """;
                 var player = conn.QueryFirst<Player>(sql, new { playerID }, commandType: CommandType.StoredProcedure);
                 return player;
