@@ -20,8 +20,8 @@ namespace CourtSchedulerAPI.Controllers
         }
 
         [HttpGet]
-        [Route("{playerID}")]
-        public Court Get([FromQuery] int courtId)
+        [Route("{courtId}")]
+        public Court Get(int courtId)
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {

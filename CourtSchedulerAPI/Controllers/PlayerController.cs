@@ -1,9 +1,9 @@
 ﻿using CourtSchedulerAPI.Types;
+using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Dapper;
-using System.Data;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace CourtSchedulerAPI.Controllers
 {
@@ -21,11 +21,14 @@ namespace CourtSchedulerAPI.Controllers
 
         [HttpGet]
         [Route("{playerID}")]
-        public Player Get([FromQuery] int playerID)
+        public Player Get(int playerID)
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var player = conn.QueryFirstOrDefault<Player>("dbo.Player_Select", new { ID = playerID }, commandType: CommandType.StoredProcedure);
+                var sql = """
+                    SELECT * FROM Player WHERE PlayerId = COALESCE(@playerID, PlayerId)
+                    """;
+                var player = conn.QueryFirst<Player>(sql, new { playerID }, commandType: CommandType.StoredProcedure);
                 return player;
             }
         }
@@ -36,7 +39,8 @@ namespace CourtSchedulerAPI.Controllers
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var players = conn.Query<Player>("dbo.Player_Select", commandType: CommandType.StoredProcedure).ToList();
+                var sql = "SELECT * FROM Players";
+                var players = conn.Query<Player>(sql).ToList();
                 return players;
             }
         }
@@ -47,18 +51,30 @@ namespace CourtSchedulerAPI.Controllers
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var res = conn.Execute("dbo.Player_Insert", req, commandType: CommandType.StoredProcedure);
+                var sql = """
+                    INSERT INTO Players (FirstName, LastName, Email, Rating)
+                    VALUES (@FirstName, @LastName, @Email, @Rating)
+                    """;
+                var res = conn.Execute(sql, req);
                 return res;
             }
         }
 
         [HttpPut]
         [Route("")]
-        public int Update(Player req)
+        public int Update(Player player)
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var res = conn.Execute("dbo.Player_Update", req, commandType: CommandType.StoredProcedure);
+                var sql = """
+                    UPDATE Players SET
+                    	FirstName = COALESCE(@FirstName, FirstName),
+                    	LastName = COALESCE(@LastName, LastName),
+                    	Email = COALESCE(@Email, Email),
+                    	Rating = COALESCE(@Rating, Rating)
+                    WHERE PlayerId = @PlayerId; 
+                    """;
+                var res = conn.Execute(sql, player);
                 return res;
             }
         }

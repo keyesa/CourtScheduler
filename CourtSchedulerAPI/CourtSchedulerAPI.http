@@ -1,6 +1,3 @@
 @CourtSchedulerAPI_HostAddress = http://localhost:5058
 
-GET {{CourtSchedulerAPI_HostAddress}}/weatherforecast/
-Accept: application/json
-
 ###
