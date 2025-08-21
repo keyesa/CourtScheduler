@@ -9,11 +9,11 @@ namespace CourtSchedulerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PlayerController : ControllerBase
+    public class PlayersController : ControllerBase
     {
         private readonly string _db = "";
 
-        public PlayerController(IConfiguration configuration)
+        public PlayersController(IConfiguration configuration)
         {
             var connString = configuration.GetConnectionString("COURT_SCHEDULER");
             if (connString != null) _db = connString;
@@ -75,6 +75,20 @@ namespace CourtSchedulerAPI.Controllers
                     WHERE PlayerId = @PlayerId; 
                     """;
                 var res = conn.Execute(sql, player);
+                return res;
+            }
+        }
+
+        [HttpDelete]
+        [Route("{playerId}")]
+        public int Delete(int playerId)
+        {
+            using (SqlConnection conn = new SqlConnection(_db))
+            {
+                var sql = """
+                    DELETE FROM Players WHERE PlayerId = @playerId; 
+                    """;
+                var res = conn.Execute(sql, new { playerId });
                 return res;
             }
         }

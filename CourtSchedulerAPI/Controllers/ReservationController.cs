@@ -9,72 +9,67 @@ namespace CourtSchedulerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CourtController : ControllerBase
+    public class ReservationController : ControllerBase
     {
         private readonly string _db = "";
 
-        public CourtController(IConfiguration configuration)
+        public ReservationController(IConfiguration configuration)
         {
             var connString = configuration.GetConnectionString("COURT_SCHEDULER");
             if (connString != null) _db = connString;
         }
 
         [HttpGet]
-        [Route("{courtId}")]
-        public Court Get(int courtId)
+        [Route("{resId}")]
+        public Reservation Get(int resId)
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = """
-                    SELECT * FROM Court
-                    WHERE CourtId = @courtId
+                    SELECT * FROM Reservations WHERE ReservationId = COALESCE(@resId, ReservationId)
                     """;
-
-                var court = conn.QueryFirst<Court>(sql, new { courtId });
-                return court;
+                var player = conn.QueryFirst<Reservation>(sql, new { resId }, commandType: CommandType.StoredProcedure);
+                return player;
             }
         }
 
         [HttpGet]
         [Route("")]
-        public IList<Court> GetAll()
+        public IList<Reservation> GetAll()
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var sql = "SELECT * FROM Court";
-
-                var court = conn.Query<Court>(sql).ToList();
-                return court;
+                var sql = "SELECT * FROM Reservations";
+                var reservations = conn.Query<Reservation>(sql).ToList();
+                return reservations;
             }
         }
 
         [HttpPost]
         [Route("")]
-        public int Add(Court req)
+        public int Add(Reservation req)
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = """
-                    INSERT INTO Court (Name)
-                    VALUES (@Name)
+                    INSERT INTO Reservation (PlayerId, CourtId, ScheduledTime)
+                    VALUES (@PlayerId, @CourtId, @ScheduledTime)
                     """;
                 var res = conn.Execute(sql, req);
                 return res;
             }
         }
 
-        [HttpPut]
-        [Route("")]
-        public int Update(Court court)
+        [HttpDelete]
+        [Route("{resId}")]
+        public int Delete(int resId)
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = """
-                    UPDATE Court SET
-                    	Name = COALESCE(@Name, Name),
-                    WHERE CourtId = @CourtId; 
+                    DELETE FROM Reservations WHERE ReservationId = @resId; 
                     """;
-                var res = conn.Execute(sql, court);
+                var res = conn.Execute(sql, new { resId });
                 return res;
             }
         }
