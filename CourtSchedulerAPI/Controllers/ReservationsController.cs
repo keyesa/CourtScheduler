@@ -9,11 +9,11 @@ namespace CourtSchedulerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReservationController : ControllerBase
+    public class ReservationsController : ControllerBase
     {
         private readonly string _db = "";
 
-        public ReservationController(IConfiguration configuration)
+        public ReservationsController(IConfiguration configuration)
         {
             var connString = configuration.GetConnectionString("COURT_SCHEDULER");
             if (connString != null) _db = connString;
