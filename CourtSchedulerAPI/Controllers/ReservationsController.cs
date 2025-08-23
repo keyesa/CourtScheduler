@@ -39,7 +39,9 @@ namespace CourtSchedulerAPI.Controllers
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-                var sql = "SELECT * FROM Reservations";
+                var sql = """
+                    SELECT * FROM Reservations
+                    """;
                 var reservations = conn.Query<Reservation>(sql).ToList();
                 return reservations;
             }
@@ -51,6 +53,7 @@ namespace CourtSchedulerAPI.Controllers
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
+
                 var sql = """
                     INSERT INTO Reservations (PlayerId, CourtId, ScheduledTime)
                     VALUES (@PlayerId, @CourtId, @ScheduledTime)
