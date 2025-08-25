@@ -25,6 +25,8 @@ namespace CourtSchedulerAPI.Controllers
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
+
+                
                 var sql = """
                     SELECT p.*, r.ReservationId, c.*  FROM Players p
                     LEFT JOIN Reservations r ON p.PlayerId = r.PlayerId
