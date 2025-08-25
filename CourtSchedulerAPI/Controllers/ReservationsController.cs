@@ -26,9 +26,12 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = """
-                    SELECT * FROM Reservations WHERE ReservationId = COALESCE(@resId, ReservationId)
+                    SELECT p.*, r.ReservationId, c.*  FROM Players p
+                    LEFT JOIN Reservations r ON p.PlayerId = r.PlayerId
+                    LEFT JOIN Courts c ON r.CourtId = c.CourtId
+                    WHERE ReservationId = COALESCE(@resId, ReservationId)
                     """;
-                var player = conn.QueryFirst<Reservation>(sql, new { resId }, commandType: CommandType.StoredProcedure);
+                var player = conn.Query<Player, FlatReservation, Court, Reservation>(sql, new { resId }, commandType: CommandType.StoredProcedure, );
                 return player;
             }
         }
@@ -40,7 +43,9 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = """
-                    SELECT * FROM Reservations
+                    SELECT p.*, r.ReservationId, c.*  FROM Players p
+                    LEFT JOIN Reservations r ON p.PlayerId = r.PlayerId
+                    LEFT JOIN Courts c ON r.CourtId = c.CourtId
                     """;
                 var reservations = conn.Query<Reservation>(sql).ToList();
                 return reservations;
