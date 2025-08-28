@@ -26,19 +26,19 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = $"""
-                    SELECT p.*, r.ReservationId, c.*  FROM Reservations r
+                    SELECT p.*, r.ReservationId AS ResId, c.*  FROM Reservations r
                     LEFT JOIN Players p ON p.PlayerId = r.PlayerId
                     LEFT JOIN Courts c ON r.CourtId = c.CourtId
-                    WHERE ReservationId = COALESCE(@resId, ReservationId)
+                    WHERE ReservationId = COALESCE({resId}, ReservationId)
                     """;
 
-                var reservations = conn.Query<Player, FlatReservation, Court, Reservation>(sql, new { resId }, mapped: (player , flatRes, court) => {
+                var reservations = conn.Query<Player, FlatReservation, Court, Reservation>(sql, map: (player , flatRes, court) => {
                     Reservation res = new Reservation();
                     res.ReservationId = flatRes.ReservationId;
                     res.Players.Add(player);
                     res.Court = court;
                     return res;
-                }, splitOn: "p.ReservationId,  c.CourtId");
+                }, splitOn: "ResId,  c.CourtId");
                 
                 var result = reservations.GroupBy(p => p.ReservationId).Select(r => {
                     var groupedRes = r.First();
@@ -46,7 +46,7 @@ namespace CourtSchedulerAPI.Controllers
                     return groupedRes;
                 }).First(); // should just be the one reservation anyway because of Id
 
-                return result
+                return result;
             }
         }
 
@@ -57,34 +57,35 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = $"""
-                    SELECT p.*, r.ReservationId, c.*  FROM Reservations r
+                    SELECT p.*, r.ReservationId AS ResId, c.* FROM Reservations r
                     LEFT JOIN Players p ON p.PlayerId = r.PlayerId
                     LEFT JOIN Courts c ON r.CourtId = c.CourtId
                     """;
 
-                var reservations = conn.Query<Player, FlatReservation, Court, Reservation>(sql, mapped: (player , flatRes, court) => {
+                var reservations = conn.Query<Player, FlatReservation, Court, Reservation>(sql, map: (player , flatRes, court) => {
                     Reservation res = new Reservation();
                     res.ReservationId = flatRes.ReservationId;
                     res.Players.Add(player);
                     res.Court = court;
                     return res;
-                }, splitOn: "p.ReservationId,  c.CourtId");
+                }, splitOn: "ResId,  c.CourtId");
                 
                 var result = reservations.GroupBy(p => p.ReservationId).Select(r => {
                     var groupedRes = r.First();
                     groupedRes.Players = r.Select(p => p.Players.Single()).ToList();
                     return groupedRes;
-                });
+                }).ToList();
+
+                return result;
             }
         }
 
         [HttpPost]
         [Route("")]
-        public int Add(Reservation req)
+        public int Add(FlatReservation req)
         {
             using (SqlConnection conn = new SqlConnection(_db))
             {
-
                 var sql = """
                     INSERT INTO Reservations (PlayerId, CourtId, ScheduledTime)
                     VALUES (@PlayerId, @CourtId, @ScheduledTime)
