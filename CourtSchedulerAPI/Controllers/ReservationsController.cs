@@ -26,7 +26,7 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = $"""
-                    SELECT p.*, r.ReservationId AS ResId, c.*  FROM Reservations r
+                    SELECT p.*, r.Reservation as ResId, r.CourtId, r.PlayerId, r.ScheduledTime, c.CourtId, c.Name FROM Reservations r
                     LEFT JOIN Players p ON p.PlayerId = r.PlayerId
                     LEFT JOIN Courts c ON r.CourtId = c.CourtId
                     WHERE ReservationId = COALESCE({resId}, ReservationId)
@@ -57,7 +57,7 @@ namespace CourtSchedulerAPI.Controllers
             using (SqlConnection conn = new SqlConnection(_db))
             {
                 var sql = $"""
-                    SELECT p.*, r.ReservationId AS ResId, c.* FROM Reservations r
+                    SELECT p.*, r.Reservation as ResId, r.CourtId, r.PlayerId, r.ScheduledTime, c.CourtId, c.Name FROM Reservations r
                     LEFT JOIN Players p ON p.PlayerId = r.PlayerId
                     LEFT JOIN Courts c ON r.CourtId = c.CourtId
                     """;
