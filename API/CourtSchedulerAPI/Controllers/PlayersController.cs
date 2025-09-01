@@ -28,7 +28,7 @@ namespace CourtSchedulerAPI.Controllers
                 var sql = """
                     SELECT * FROM Players WHERE PlayerId = COALESCE(@playerID, PlayerId)
                     """;
-                var player = conn.QueryFirst<Player>(sql, new { playerID }, commandType: CommandType.StoredProcedure);
+                var player = conn.QueryFirst<Player>(sql, new { playerID });
                 return player;
             }
         }

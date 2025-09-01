@@ -109,7 +109,7 @@ namespace CourtSchedulerAPI.Controllers
                     	ScheduledTime = COALESCE(@ScheduledTime, ScheduledTime),
                     WHERE PlayerId = @PlayerId AND CourtId = @CourtId AND ReservationId = @ReservationId; 
                     """;
-                var res = conn.Execute(sql, player);
+                var res = conn.Execute(sql, flatRes);
                 return res;
             }
         }
