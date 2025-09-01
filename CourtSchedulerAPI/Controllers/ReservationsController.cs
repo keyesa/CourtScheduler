@@ -95,6 +95,25 @@ namespace CourtSchedulerAPI.Controllers
             }
         }
 
+        //might come in handy later, idk, just for changing time
+        [HttpPut]
+        [Route("")]
+        public int Update(FlatReservation flatRes)
+        {
+            using (SqlConnection conn = new SqlConnection(_db))
+            {
+                var sql = """
+                    UPDATE Reservations SET
+                    	PlayerId = COALESCE(@PlayerId, PlayerId),
+                    	CourtId = COALESCE(@CourtId, CourtId),
+                    	ScheduledTime = COALESCE(@ScheduledTime, ScheduledTime),
+                    WHERE PlayerId = @PlayerId AND CourtId = @CourtId AND ReservationId = @ReservationId; 
+                    """;
+                var res = conn.Execute(sql, player);
+                return res;
+            }
+        }
+
         [HttpDelete]
         [Route("{resId}")]
         public int Delete(int resId)
