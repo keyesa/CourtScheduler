@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
@@ -10,6 +10,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.8" PrivateAssets="all" />
     <PackageReference Include="MudBlazor" Version="8.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Types\" />
   </ItemGroup>
 
 </Project>
